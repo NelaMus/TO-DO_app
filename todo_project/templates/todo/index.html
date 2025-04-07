@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Moje TO-DO aplikace</title>
+</head>
+<body>
+    <h1>Moje úkoly</h1>
+    <form method="post" action="{% url 'pridat' %}">
+        {% csrf_token %}
+        <input type="text" name="popis" placeholder="Zadej úkol" required>
+        <button type="submit">Přidat</button>
+    </form>
+    <ul>
+        {% for ukol in ukoly %}
+            <li>
+                {{ ukol.popis }}
+                {% if ukol.splneno %}
+                    ✔️
+                {% else %}
+                    <a href="{% url 'splnit' ukol.id %}">[Splnit]</a>
+                {% endif %}
+                <a href="{% url 'smazat' ukol.id %}">[Smazat]</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
