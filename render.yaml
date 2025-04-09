@@ -3,7 +3,7 @@ services:
     name: todo-app
     env: python
     plan: free
-    buildCommand: "./build.sh"
+    buildCommand: "./todo_project/build.sh"
     startCommand: "gunicorn todo_project.wsgi:application"
     envVars:
       - key: DATABASE_URL

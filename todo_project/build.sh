@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Skript pro Render – vytvoří migrace a aplikuje je
+# build.sh
 
-python manage.py makemigrations
+# Ukonči skript při chybě
+set -o errexit
+
+# Instalace závislostí
+pip install -r requirements.txt
+
+# Migrate databázi
 python manage.py migrate
-python manage.py collectstatic --noinput
