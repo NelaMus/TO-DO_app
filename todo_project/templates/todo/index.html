@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Moje úkoly</h1>
-    <form method="post" action="{% url 'pridat' %}">
+    <form method="post" action="{% url 'pridat_ukol' %}">
         {% csrf_token %}
         <input type="text" name="popis" placeholder="Zadej úkol" required>
         <button type="submit">Přidat</button>
