@@ -7,8 +7,10 @@ def index(request):
 
 def pridat_ukol(request):
     if request.method == 'POST':
+        nazev = request.POST.get('nazev')
         popis = request.POST.get('popis')
-        if popis:
+        if nazev:
+            Ukol.objects.create(nazev=nazev)
             Ukol.objects.create(popis=popis)
     return redirect('index')
 
