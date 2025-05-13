@@ -7,6 +7,14 @@
 </head>
 <body>
     <h1>Moje úkoly</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="nazev" placeholder="Název úkolu" required>
+        <input type="text" name="popis" placeholder="Popis úkolu">
+        <button type="submit">Přidat úkol</button>
+    </form>
+    
     <form method="post" action="odkaz na views.py a na fci pridat_ukol()">
         <input type="text" name="nazev" placeholder="Zadej název úkolu" required>
         <button id ="create" type="button" class="btn btn-outline-success">Přidat</button>
