@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Přihlášení</title>
+    </head>
+    <body>
+        <h2>Přihlášení</h2>
+        {% if form.errors %}
+            <p style="color: red;">Špatné jméno nebo heslo. Zkuste to znovu.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Přihlásit</button>
+        </form>
+        <p>Nemáte účet? <a href="{% url 'registrace' %}">Zaregistrujte se zde</a>.</p>
+    </body>
+</html>

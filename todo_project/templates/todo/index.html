@@ -8,32 +8,54 @@
 <body>
     <h1>Moje úkoly</h1>
 
-    <form method="POST">
+    <p>
+        Přihlášen jako <strong>{{ request.user.username }}</strong>
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+            <button type="submit">Odhlásit se</button>
+        </form>
+    </p>
+
+    <form method="POST" action="{% url 'pridat_ukol' %}">
+        {% if form.errors %}
+            <p style="color: red;">{{ form.errors }}</p>
+        {% endif %}
         {% csrf_token %}
         <input type="text" name="nazev" placeholder="Název úkolu" required>
         <input type="text" name="popis" placeholder="Popis úkolu">
         <button type="submit">Přidat úkol</button>
     </form>
     
-    <form method="post" action="odkaz na views.py a na fci pridat_ukol()">
-        <input type="text" name="nazev" placeholder="Zadej název úkolu" required>
-        <button id ="create" type="button" class="btn btn-outline-success">Přidat</button>
-    </form><br>
-    <form method="post" action="odkaz na views.py a na fci pridat_ukol()">
-        <input type="text" name="popis" placeholder="Zadej popis úkolu" required>
-    </form>
+    <h4>🟡 Nesplněné úkoly</h4><br>
+
     <ul>
+        {% for ukol in nesplnene %}
         <li>
-            <div class="mb-3">
-                <label class="form-label" data-i18n="q2">Skupiny úkolu:</label>
-                <div id="q1" class="form-check"></div>
-              </div>
-            Tady se budou zobrazovat úkoly...<br>
-            ....................................<br>
-            Tady se bude odklikávat splněno...<br>
-            Tady se bude upravovat úkoly...<br>
-            Tady se bude mazat úkol...<br>
+            {{ ukol.nazev }} - {{ ukol.popis }}<br>
+            <a href="{% url 'splnit_ukol' ukol.id %}">Splnit</a>
+            <a href="{% url 'upravit_ukol' ukol.id %}">Upravit</a>
+            <a href="{% url 'smazat_ukol' ukol.id %}">Smazat 🗑</a>
         </li>
+        {% empty %}
+        <li>Již jsi splnil všechny své úkoly! Výborně, gratuluji!</li>
+        {% endfor %}
+    </ul>
+
+<br><br>
+
+    <h4>🟢 Splněné úkoly</h4><br>
+
+    <ul>
+        {% for ukol in splnene %}
+        <li>
+            <div style="color: rgb(92, 206, 12);">{{ ukol.nazev }} - {{ ukol.popis }}</div>
+            <a href="{% url 'splnit_ukol' ukol.id %}">Označit jako nesplněný</a>
+            <a href="{% url 'upravit_ukol' ukol.id %}">Upravit</a>
+            <a href="{% url 'smazat_ukol' ukol.id %}">Smazat 🗑</a>
+        </li>
+        {% empty %}
+        <li>Ještě jsi nesplnil žádné úkoly. Tak rychle do toho!</li>
+        {% endfor %}
     </ul>
 </body>
 </html>
