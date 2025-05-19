@@ -3,12 +3,18 @@ from .models import Ukol
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.contrib import messages
 
 @login_required
 def index(request):
     nesplnene = Ukol.objects.filter(splneno=False)
     splnene = Ukol.objects.filter(splneno=True)
-    return render(request, 'todo/index.html', {'nesplnene': nesplnene, 'splnene': splnene})
+    return render(request, 'todo/index.html', {
+        'nesplnene': nesplnene, 
+        'splnene': splnene, 
+        'pocet_nesplnenych': nesplnene.count(), 
+        'pocet_splnenych': splnene.count()
+        })
 
 def registrace(request):
     if request.method == 'POST':
@@ -40,8 +46,8 @@ def upravit_ukol(request, id):
     if request.method == 'POST':
         ukol.nazev = request.POST.get('nazev')
         ukol.popis = request.POST.get('popis')
-
         ukol.save()
+        messages.success(request, 'Úkol byl úspěšně upraven.')
         return redirect('index')
     return render(request, 'todo/upravit.html', {'ukol': ukol})
 
@@ -50,3 +56,5 @@ def smazat_ukol(request, id):
     ukol.delete()
     return redirect('index')
 
+def pocasi(request):
+    return render(request, 'todo/pocasi.html')

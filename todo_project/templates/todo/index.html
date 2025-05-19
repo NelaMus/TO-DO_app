@@ -1,61 +1,144 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <title>Moje TO-DO aplikace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+body {
+            background: linear-gradient(120deg, #f0f4f8 0%, #e0eafc 100%);
+            min-height: 100vh;
+        }
+        .todo-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .weather-box {
+            background: #e3f2fd;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 1.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>Moje úkoly</h1>
-
-    <p>
-        Přihlášen jako <strong>{{ request.user.username }}</strong>
-        <form action="{% url 'logout' %}" method="post" style="display:inline;">
-        {% csrf_token %}
-            <button type="submit">Odhlásit se</button>
-        </form>
-    </p>
-
-    <form method="POST" action="{% url 'pridat_ukol' %}">
-        {% if form.errors %}
-            <p style="color: red;">{{ form.errors }}</p>
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success text-center">{{ message }}</div>
+            {% endfor %}
         {% endif %}
-        {% csrf_token %}
-        <input type="text" name="nazev" placeholder="Název úkolu" required>
-        <input type="text" name="popis" placeholder="Popis úkolu">
-        <button type="submit">Přidat úkol</button>
-    </form>
-    
-    <h4>🟡 Nesplněné úkoly</h4><br>
+        <div class="row">
+            <!-- Levý sloupec: Úkoly -->
+            <div class="col-md-7">
+                <div class="todo-box">
+                    <h1 class="mb-4">Moje úkoly</h1>
+                    <form method="POST" action="{% url 'pridat_ukol' %}" class="mb-3">
+                        {% if form.errors %}
+                            <p style="color: red;">{{ form.errors }}</p>
+                        {% endif %}
+                        {% csrf_token %}
+                        <div class="row g-2">
+                            <div class="col">
+                                <input type="text" name="nazev" class="form-control" placeholder="Název úkolu" required>
+                            </div>
+                            <div class="col">
+                                <input type="text" name="popis" class="form-control" placeholder="Popis úkolu">
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-success">Přidat úkol</button>
+                            </div>
+                        </div>
+                    </form>
+                    <h4>🟡 Nesplněné úkoly</h4>
+                    <ul>
+                        {% for ukol in nesplnene %}
+                        <li>
+                            {{ ukol.nazev }} - {{ ukol.popis }}<br>
+                            <a href="{% url 'splnit_ukol' ukol.id %}" class="btn btn-sm btn-success me-1 mb-1">Splnit ✅</a>
+                            <a href="{% url 'upravit_ukol' ukol.id %}" class="btn btn-sm btn-warning me-1 mb-1">Upravit ✏️</a>
+                            <a href="{% url 'smazat_ukol' ukol.id %}" class="btn btn-sm btn-danger me-1 mb-1">Smazat 🗑</a>
+                        </li>
+                        {% empty %}
+                        <li>✅ Již jsi splnil všechny své úkoly! Výborně, gratuluji! ✅</li>
+                        {% endfor %}
+                    </ul>
+                    <h4 class="mt-4">🟢 Splněné úkoly</h4>
+                    <ul>
+                        {% for ukol in splnene %}
+                        <li>
+                            <div style="color: rgb(92, 206, 12);">{{ ukol.nazev }} - {{ ukol.popis }}</div>
+                            <a href="{% url 'splnit_ukol' ukol.id %}" class="btn btn-sm btn-secondary me-1 mb-1">Označit jako nesplněný</a>
+                            <a href="{% url 'upravit_ukol' ukol.id %}"class="btn btn-sm btn-warning me-1 mb-1">Upravit</a>
+                            <a href="{% url 'smazat_ukol' ukol.id %}" class="btn btn-sm btn-danger me-1 mb-1">Smazat 🗑</a>
+                        </li>
+                        {% empty %}
+                        <li>Ještě jsi nesplnil žádné úkoly. Tak rychle do toho!</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="text-center my-3" id="nahodny-img-box"></div>
+            </div>
+            <!-- Pravý sloupec: Počasí a uživatel -->
+            <div class="col-md-5">
+                <div class="weather-box mb-3">
+                    <div id="weatherBox"></div>
+                </div>
+                <div class="weather-box mb-3">
+                    <canvas id="ukolyChart" width="150" height="150"></canvas>
+                </div>
+                <div class="todo-box">
+                    <p>
+                        Přihlášen jako <strong>{{ request.user.username }}</strong>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Odhlásit se</button>
+                        </form>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script defer src="{% static 'todo/hl_script_pocasi.js' %}"></script>
+    <script>
+    window.ukolyData = [
+        Number('{{ pocet_nesplnenych|default:"0" }}'),
+        Number('{{ pocet_splnenych|default:"0" }}')
+    ];
+</script>
+<script defer src="{% static 'todo/ukoly_chart.js' %}"></script>
+<script>
+    // Seznam obrázků (můžeš přidat libovolné odkazy)
+    const obrazky = [
+        "https://skvelilide.cz/wp-content/uploads/2022/11/5.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/6.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/7.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/8.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/9.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/10.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/11.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/12.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/13.png",
+        "https://skvelilide.cz/wp-content/uploads/2022/11/14.png",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF-dQPb4tU_MvrkuJvLyPy86toZ5nAnkrmfA&src=1",
+        "https://citaty.net/media/quote-images/00/03/317/jara-cimrman-muzeme-o-tom-vest-spory-muzeme-s-tim-nesouhlasit.jpeg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFNXXbJpq_a0fxCmg2_s310_iWki6yedbvDg&src=1",
 
-    <ul>
-        {% for ukol in nesplnene %}
-        <li>
-            {{ ukol.nazev }} - {{ ukol.popis }}<br>
-            <a href="{% url 'splnit_ukol' ukol.id %}">Splnit</a>
-            <a href="{% url 'upravit_ukol' ukol.id %}">Upravit</a>
-            <a href="{% url 'smazat_ukol' ukol.id %}">Smazat 🗑</a>
-        </li>
-        {% empty %}
-        <li>Již jsi splnil všechny své úkoly! Výborně, gratuluji!</li>
-        {% endfor %}
-    </ul>
 
-<br><br>
+    ];
 
-    <h4>🟢 Splněné úkoly</h4><br>
-
-    <ul>
-        {% for ukol in splnene %}
-        <li>
-            <div style="color: rgb(92, 206, 12);">{{ ukol.nazev }} - {{ ukol.popis }}</div>
-            <a href="{% url 'splnit_ukol' ukol.id %}">Označit jako nesplněný</a>
-            <a href="{% url 'upravit_ukol' ukol.id %}">Upravit</a>
-            <a href="{% url 'smazat_ukol' ukol.id %}">Smazat 🗑</a>
-        </li>
-        {% empty %}
-        <li>Ještě jsi nesplnil žádné úkoly. Tak rychle do toho!</li>
-        {% endfor %}
-    </ul>
+    // Pokud existuje box pro obrázek, vlož náhodný obrázek
+    const box = document.getElementById('nahodny-img-box');
+    if (box) {
+        const nahodny = obrazky[Math.floor(Math.random() * obrazky.length)];
+        box.innerHTML = `<img src="${nahodny}" alt="Náhodný obrázek" style="max-width: 500px;">`;
+    }
+</script>
 </body>
 </html>

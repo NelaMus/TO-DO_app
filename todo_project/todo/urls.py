@@ -8,4 +8,5 @@ urlpatterns = [
     path('upravit/<int:id>/', views.upravit_ukol, name='upravit_ukol'),
     path('smazat/<int:id>/', views.smazat_ukol, name='smazat_ukol'),
     path ('registrace/', views.registrace, name='registrace'),
+    path('pocasi/', views.pocasi, name='pocasi'),
 ]
