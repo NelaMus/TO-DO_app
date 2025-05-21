@@ -28,10 +28,10 @@ function displayWeather(data) {
     const weatherHtml = `
         <h3>${name}</h3>
         <p><strong>Teplota:</strong> ${main.temp}°C</p>
-        <p><strong>Pocitova teplota:</strong> ${main.feels_like}°C</p>
-        <p><strong>Pocasi:</strong> ${weather[0].description}</p>
+        <p><strong>Pocitová teplota:</strong> ${main.feels_like}°C</p>
+        <p><strong>Počasí:</strong> ${weather[0].description}</p>
         <p><strong>Tlak: </strong>${main.pressure}</p>
-        <p><strong>Rychlost vetru: </strong>${wind.speed}</p>
+        <p><strong>Rychlost větru: </strong>${wind.speed}</p>
         <img src="https://openweathermap.org/img/wn/${weather[0].icon}@2x.png" alt="Weather Icon">
     `;
 

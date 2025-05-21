@@ -74,8 +74,8 @@ body {
                         {% for ukol in splnene %}
                         <li>
                             <div style="color: rgb(92, 206, 12);">{{ ukol.nazev }} - {{ ukol.popis }}</div>
-                            <a href="{% url 'splnit_ukol' ukol.id %}" class="btn btn-sm btn-secondary me-1 mb-1">Označit jako nesplněný</a>
-                            <a href="{% url 'upravit_ukol' ukol.id %}"class="btn btn-sm btn-warning me-1 mb-1">Upravit</a>
+                            <a href="{% url 'splnit_ukol' ukol.id %}" class="btn btn-sm btn-secondary me-1 mb-1">Označit jako nesplněný ❌</a>
+                            <a href="{% url 'upravit_ukol' ukol.id %}"class="btn btn-sm btn-warning me-1 mb-1">Upravit ✏️</a>
                             <a href="{% url 'smazat_ukol' ukol.id %}" class="btn btn-sm btn-danger me-1 mb-1">Smazat 🗑</a>
                         </li>
                         {% empty %}
